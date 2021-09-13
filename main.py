@@ -5,6 +5,7 @@ def compare(str, sample):
         for s in sample:
             if(s != "%"):
                 return "NO"
+    length = len(sample)
     while i < len(str):
         if(j >= len(sample)): return "NO"
         if ((str[i] == sample[j] and sample[j] != "[" and sample[j] != "%") or sample[j] == "_"):
@@ -18,52 +19,88 @@ def compare(str, sample):
         elif (sample[j] == "%"):
             if (i > abs(len(str) - len(sample[j:]))):
                 j += 1
+                length -= 1
             else:
                 i += 1
         elif (sample[j] == "["):
             formula = ""
+            l = j
             j += 1
-            while (sample[j] != "]"):
+            while (sample[j] != "]" and j != l):
                 formula += sample[j]
                 j += 1
-            if (len(formula) == 1):
-                if (str[i] == formula):
-                    j += 1
-                    i += 1
-                else:
-                    return "NO"
-            elif (len(formula) == 0):
+                if j == len(sample):
+                    if(sample[l] != str[i]): return "NO"
+                    else:
+                        j = l
+                        formula = ""
+            if (j == l):
                 j += 1
-            elif (len(formula) == 2):
-                if (formula[0] == str[i] or formula[1] == str[i]):
-                    j += 1
-                    i += 1
+                i += 1
             else:
-                log = 0
-                while (formula != "" and log == 0):
-                    subformula = ""
-                    k = 0
-                    if(len(formula)>=3):
-                        if (formula[1] == "-" and formula[2] != "-"):
-                            subformula = formula[:3]
-                            formula = formula[3:]
-                            if (ord(subformula[0]) <= ord(str[i]) and ord(str[i]) <= ord(subformula[2])):
-                                log = 1
+                length -= (len(formula) + 1)
+                if (len(formula) == 1):
+                    if (str[i] == formula):
+                        j += 1
+                        i += 1
+                    else:
+                        return "NO"
+                elif (len(formula) == 0):
+                    j += 1
+                    length -= 1
+                elif (len(formula) == 2):
+                    if(formula[0] == "^" and formula[1] != str[i]):
+                        j += 1
+                        i += 1
+                    elif (formula[0] == str[i] or formula[1] == str[i]):
+                        j += 1
+                        i += 1
+                    else:
+                        return "NO"
+                else:
+                    log = 0
+                    anti = 1
+                    if (formula[0] == "^"):
+                        anti = 0
+                        formula = formula[1:]
+                    while (formula != "" and log == 0):
+                        subformula = ""
+                        if(len(formula)>=3):
+                            if (formula[1] == "-" and formula[2] != "-"):
+                                subformula = formula[:3]
+                                formula = formula[3:]
+                                if(anti):
+                                    if (ord(subformula[0]) <= ord(str[i]) and ord(str[i]) <= ord(subformula[2])):
+                                        log = 1
+                                else:
+                                    if (ord(subformula[0]) <= ord(str[i]) and ord(str[i]) <= ord(subformula[2])):
+                                        return "NO"
+                            else:
+                                subformula = formula
+                                formula = ""
+                                if(anti):
+                                    for symb in subformula:
+                                        if (symb == str[i]):
+                                            log = 1
+                                else:
+                                    for symb in subformula:
+                                        if (symb == str[i]):
+                                            return "NO"
                         else:
                             subformula = formula
                             formula = ""
-                            for symb in subformula:
-                                if (symb == str[i]):
-                                    log = 1
-                    else:
-                        subformula = formula
-                        formula = ""
-                        for symb in subformula:
-                            if (symb == str[i]):
-                                log = 1
-                if (log == 1):
-                    j += 1
-                    i += 1
+                            if (anti):
+                                for symb in subformula:
+                                    if (symb == str[i]):
+                                        log = 1
+                            else:
+                                for symb in subformula:
+                                    if (symb == str[i]):
+                                        return "NO"
+                    if (log == 1):
+                        j += 1
+                        i += 1
+    if(length > len(str)): return "NO"
     return "YES"
 
 def pref_func(str):
