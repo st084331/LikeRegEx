@@ -6,6 +6,13 @@ def compare(str, sample):
             if(s != "%"):
                 return "NO"
     length = len(sample)
+    k = 1
+    while k < length:
+        if(sample[k] == "%" and sample[k-1] == "%"):
+            sample = sample[:k-1] + sample[k:]
+            length -= 1
+            k -= 1
+        k +=1
     while i < len(str):
         if(j >= len(sample)): return "NO"
         if ((str[i] == sample[j] and sample[j] != "[" and sample[j] != "%") or sample[j] == "_"):
@@ -100,7 +107,12 @@ def compare(str, sample):
                     if (log == 1):
                         j += 1
                         i += 1
-    if(length > len(str)): return "NO"
+    if(length > len(str)):
+        while length != len(str):
+            if(sample[length - 1] == "%"):
+                length -= 1
+            else:
+                return "NO"
     return "YES"
 
 def pref_func(str):
@@ -127,4 +139,7 @@ for i in range(N):
     likes = [i for i in likes if i != 0]
     str = command[1:likes[len(likes)//2]]
     sample = command[likes[len(likes)//2] + len("' like '"):len(command) - 1]
-    print(compare(str, sample))
+    if(i < N - 1):
+        print(compare(str, sample))
+    else:
+        print(compare(str, sample), end="")
